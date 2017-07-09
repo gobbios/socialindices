@@ -1,0 +1,45 @@
+---
+title: "`socialindices` - a (not entirely) brief tutorial to quantify social bonds with `R`"
+author: "Christof Neumann"
+date: "`r Sys.Date()`"
+header-includes:
+   - \usepackage[table]{xcolor}
+output: 
+  rmarkdown::pdf_document:
+    toc: true
+    toc_depth: 2
+bibliography: refs.bib
+csl: animal-behaviour.csl
+vignette: >
+  %\VignetteIndexEntry{general notes}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+
+
+
+
+
+
+```{r child='01intro.Rmd'}
+```
+
+
+```{r child='02dsi.Rmd'}
+```
+
+```{r child='03csi.Rmd'}
+```
+
+```{r child='04a_assointro.Rmd'}
+```
+
+```{r child='04b_pafi.Rmd'}
+```
+
+\clearpage
+
+
+# References
+

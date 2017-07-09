@@ -1,0 +1,134 @@
+## Pairwise affinity index
+
+This index is based on association data and been developed specifically to deal with animals that don't forage in cohesive groups, but fission and fusion over time [@pepper1999; @silk2013a]. However, while originally aimed at fission-fusion systems, this index can also be used to analyse associations *within* stable groups in which proximity between individuals can nevertheless vary.
+
+The pairwise affinity index also contains a significance test as described by @pepper1999. \index{pafi()@\texttt{pafi()}} It is based on flipping pairs of individuals and their presences in two parties, the so-called 'flipping rule' [@whitehead2005; @bejder1998; @manly1995]. In this way party sizes remain unchanged and only their composition is randomized. The randomization procedure here contains yet another twist, that is flipping can only occur if the two individuals were present in the group/community on the days the randomized flips are introduced (see section~\ref{sec:paficores}, p.~\pageref{sec:paficores}, [@whitehead2005; @whitehead1999a]. This controls for possible dynamics on the level of overall group/community composition. What appears to be an accessible introduction to such randomization procedures is given by Whitehead [@whitehead2008].\index{flipping}
+
+The pairwise affinity index is calculated as:
+
+\begin{equation}
+\frac
+{ I_{AB} \times \sum_{1}^{n} s_i(s_i - 1) }
+{ \sum A_i(s_i - 1) \times \sum B_i(s_i - 1) }
+\end{equation}
+
+For each pair of individuals $AB$, the number of times both were in the same party (or otherwise spatially associated) is computed ($I_{AB}$). OOOO TO BE COMPLETED... OOOO
+
+To illustrate the application of the pairwise affinity index, we use a data set taken from @bejder1998 on dolphin associations. We start by loading the \texttt{socialindices} package, the data set and then just look at the first few rows of the data set so you can get a feeling of how the data should look like.
+
+```{r}
+library(socialindices2)
+data(dolphins)
+head(dolphins)
+```
+
+The data set contains 40 scans of dolphin associations, which comprise 18 recognized individuals ('A' through 'R'). In the table, we can see that other than the 18 columns for the individuals, we only have a date column\footnote{the actual calender dates were invented by me, for illustrative purposes} as additional information (compare to table~\ref{tab:data-ex4}, p.~\pageref{tab:data-ex4}). To calculate association indices, we actually don't necessarily need the dates, but we will get to that later.
+
+First, we start out by calculating the pairwise affinity index, and store it in an object named `res`:
+
+```{r}
+set.seed(123); res <- pafi(dolphins, flips = 100, rand = 100, progbar = F)
+res[, c("PAfI", "exp")] <- round(res[, c("PAfI", "exp")], 3)
+head(res)
+```
+
+I printed here only the first six rows of the results (that's what the function `head()` does).\footnote{The `set.seed()` bit simply ensures that the randomization procedure involved for the $p$-value reproduces the same results when you run this code on your computer. For your own data, leave it out. I also rounded the actual index and the expected values to three digits, so the results fit on the page.} There are a total of $18 \times 17 / 2 = 153$ dyads/rows when having 18 individuals. The important bits of the results are the columns `ID1`, `ID2`, `dyad` and `PAfI`, which contain the individual IDs, the dyad ID and the actual index for a given dyad.
+
+In addition, we also calculated an expected index for each dyad (column \texttt{exp}). This expected value can be used to assess the significance of a dyad's observed association index.\footnote{See section~\ref{sec:signif} for some more details.} This expected values is based multiple randomizations of the association data, which each in turn underwent a certain number of flips [see @bejder1998 for details]. In our example, we used 100 flips (\texttt{flips=100}) for each of the 100 randomly generated data sets (\texttt{rand=100}). These are both modest numbers, which should be increased to obtain reliable results. Note that dyads dyads not only can associate above expectation, but also below. In fact, among the first six dyads in the above example, the only dyad that associated differently from expected did so \textit{below} expectation (line 4, dyad $A \ast E$). If we want to see all dyads that were different from expectation, we can use:
+
+```{r}
+res[!is.na(res$abovechance), ]
+```
+
+Now we can customize the analysis a little bit, for example by setting a date range, i.e. limiting association indices to desired dates. For this, we have to set the argument \texttt{daterange=}. In this example, I want the association indices for January 2000.\footnote{I don't display the results}
+
+```{r, eval=FALSE}
+pafi(dolphins, daterange = c("2000-01-01", "2000-01-31"), flips = 100, rand = 100)
+```
+
+If you have a larger data set, you may want to calculate an association index for several distinct time blocks.\index{time block} You can do this in two different ways with the function \texttt{multiasso()}.\index{multiasso()@\texttt{multiasso()}} First, you can supply a list of different date ranges to the function and use such a list for the function, for example:
+
+```{r}
+mytimeperiods <- list(c("2000-01-01", "2000-01-10"), c("2000-01-31", "2000-02-09"))
+# res <- multiasso(dolphins, whichindex = "PAFI", daterange = mytimeperiods)
+```
+
+The result of this is a list again, which contains two items. First, a table with the date ranges you specified and second, a table with the actual results for the calculation of the index. You can see that in the example, we obtain two values for each dyad corresponding to the two time periods we specified in \texttt{mytimeperiods}.
+
+```{r}
+# res[[1]]
+# head(res[[2]])
+```
+
+Currently, the function also allows to automatically detect calender months, 2-month blocks and 3-month blocks, and do the calculations by time block without specifying each date range separately in the \texttt{daterange=} argument. For example:
+
+<<>>=
+res <- multiasso(dolphins, whichindex = "PAFI", daterange = "months")
+res[[1]]
+head(res[[2]])
+@
+
+Because the dolphin example contains data for two months (in fact the data end 10 February), we obtain two time periods. For 2-month blocks, use \texttt{daterange = "bimonth"} and for 3-month blocks \texttt{daterange = "trimonth"}. Note that these latter two versions start in a given year's January and incomplete time blocks are ignored. For example, if your data set contains data from February through December, this will result in five 2-month blocks (Mar/Apr, May/Jun, Jul/Aug, Sep/Oct, Nov/Dec) or three 3-month blocks (Apr/May/Jun, Jul/Aug/Sep, Oct/Nov/Dec).
+
+We can also specify the individuals for which we want the the indices calculated. This works actually by indicating which columns we want to \textit{not} include. Here, we use individuals 'A', 'E', 'F', 'G', and 'H'. This results in 10 dyads. Note the dyad $A \times E$, which is not significantly below its expected value.
+
+
+```{r}
+set.seed(123); res <- pafi(dolphins, flips = 100, rand = 100, progbar = F,
+     exclcols = c("B", "C", "D", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R"))
+res[, c("PAfI", "exp")] <- round(res[, c("PAfI", "exp")], 3)
+res
+```
+
+The function also works without the `Date` column in the association data set.
+
+```{r}
+xdata <- dolphins[, -1]
+set.seed(123); pafi(xdata, flips = 100, rand = 100, progbar = F,
+     exclcols = c("B", "C", "D", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R"))
+```
+
+## Accounting for co-residency
+\label{sec:paficores}
+
+Finally, you may want to account for co-residency (or the absence thereof). This is important only if you are interested in 'significance' of dyadic association indices in the sense that without controlling for co-residency, dyads that were never co-resident essentially have an undefined association index. However, during randomizations of the data set such dyads can actually appear to be associated, which rises the likelihood that such dyads will appear to associate above chance. This point has been made previously [@whitehead1999a; @whitehead2005], and it has been suggested to restrict randomization procedures to account for such demographic changes by creating data sets that only reflect time periods in which group/population composition was stable. My approach follows the same philosophy, yet with a different strategy as reflected in 'presence' data (see section \ref{subsec:presencecoresidency}).
+
+To demonstrate what I mean we create a small data set, which comprises one data point (association scan) per day over one month, from four individuals. Initially, all five individuals are associated during each scan. We introduce variation in associations by randomly setting some values to 0. In addition and crucially, we want to create a situation where two individuals never had the opportunity to associate, i.e. one individual left the group (it died) before the other one joined (immigrated). We achieve that by setting the first 20 days of individual 'A' to 0, i.e. individual 'A' joined the group on January 21st. Conversely we set last 20 days of 'B' to 0, thereby making 'B' leave the group on the 11th.
+
+```{r}
+asso <- data.frame(Date=seq(as.Date("2000-01-01"), as.Date("2000-01-31"), by="day"),
+                   A=1, B=1, C=1, D=1)
+set.seed(123); for(i in 2:5) asso[sample(1:nrow(asso), 16), i] <- 0
+asso$A[1:20] <- 0
+asso$B[12:31] <- 0
+```
+
+Now we create a corresponding presence table, which contains information on which individuals were present in the group on which date, and then again introduce the absence of 'A' and 'B'.
+
+```{r}
+pres <- createnullpresence(IDs = c("A", "B", "C", "D"),
+                           from = "2000-01-01", to = "2000-01-31")
+pres$A[1:20] <- 0
+pres$B[12:31] <- 0
+```
+
+Now, we can calculate the association index for this data set, accounting for co-residency.
+
+```{r}
+set.seed(123); withpres <- pafi(asso, presence = pres, progbar = F)
+withpres[, c("PAfI", "exp")] <- round(withpres[, c("PAfI", "exp")], 3)
+withpres
+```
+
+Note that you get a message, stating that one dyad ($A \ast B$) was excluded because it was never co-resident, which is exactly what we intended. Now compare that with the results if we don't account for co-residency.
+
+```{r}
+set.seed(123); nopres <- pafi(asso, progbar = F)
+nopres[, c("PAfI", "exp")] <- round(nopres[, c("PAfI", "exp")], 3)
+nopres
+```
+
+The important thing to keep in mind here is that if two individuals never had the chance to associate and we don't account for that constraint, such a dyad's affinity index will be 0. But this doesn't make sense because it implies that these two individuals 'chose' not to associate. Noteworthy in this context is also that we are likely to find a non-zero expectation for the association index of such dyads, which again does not make sense ($0.640$ in this example).
+
+Finally, note the column `coresid` (in the `withpres` object) now contains different values, indicating how many days each dyad was co-resident. If presence data is not supplied (as in `nopres`), all co-residence values will be 1.
+

@@ -1,8 +1,8 @@
-Package: socialindices
+Package: socialindices2
 Type: Package
 Title: social and association indices
 Version: 0.50.0
-Date: 2017-07-05
+Date: 2017-07-08
 Depends: 
 Author: Christof Neumann
 Maintainer: Christof Neumann <christofneumann1@gmail.com>

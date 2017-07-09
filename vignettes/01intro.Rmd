@@ -1,0 +1,21 @@
+# Introduction
+
+This tutorial describes the main functionalities of the **`socialindices`** package. The functions collated in this package can roughly be divided into two types: those that measure dyadic properties (e.g. DSI) and those that quantify individual properties (e.g. CSI). Section~\ref{sec:dsi} will describe how to calculate DSI values. Section~\ref{sec:datatypes} gives a few more details on how the data should be organized. The remaining part of this tutorial is still under development, so please ignore it for now. Also, don't be intimidated by the length of the document, most of the space is taken up by the output \texttt{R} produces.
+
+A few words on terminology. There seem to be no clear conventions regarding the abbreviation of some of the indices. For example, the individual sociality index was originally termed \textit{S} ('social connectedness', @sapolsky1997), and later on as \textit{SI} ('sociality index', @silk2013a). The extension of this individual metric to dyads was originally referred to as 'composite index of sociality' (\textit{CSI}, @silk2006) and later on as \textit{DSI} ('dyadic composite sociality index', @silk2013a). Currently, I decided to use \textit{CSI} to refer to the \textit{individual} metric, and use \textit{DSI} to refer to its \textit{dyadic} extension.
+
+When I use the word 'group' in this document I think of a monkey troop or a pack of wolves or a chimpanzee community. I'm just mentioning this because in the literature on social behavior, specifically in the work of Hal Whitehead on associations [e.g. @whitehead1999a], the term 'group' is often used as a substitute for 'observation', i.e. for him a 'group' is the combination of all individuals seen at a given place at a given time (as opposed to those individuals that were not seen/identified). So if you read about groups in papers on methodology keep this in mind.
+
+The \texttt{socialindices} is currently available only from a local file (which most likely I sent you), which means you have to install the package manually, for example with the function \texttt{install.packages()}. On Windows, use:
+```{r, eval=FALSE}
+install.packages("c:temp\\socialindices_0.28.tar.gz", type="source", repos=NULL) # for Windows
+```
+
+and on a Mac, use:
+
+```{r, eval=FALSE}
+install.packages("/Volumes/Data/temp/socialindices_0.28.tar.gz", type="source",
+                 repos=NULL) # for MacOS
+```
+
+Please make sure that the file name corresponds to the file you have, because I'm currently updating the package frequently and may forget to update this tutorial section about installation.

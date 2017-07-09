@@ -1,0 +1,342 @@
+# DSI
+\label{sec:dsi}
+
+The DSI index measures variation in strength of social bonds. Strongly bonded dyads (i.e. dyads with relatively high DSI values) are often referred to as friends [@silk2006; @silk2013a]. There seems to be some confusion about the abbreviation DSI as it has been often referred to as *CSI*. Here, I follow @silk2013a who differentiate DSI (*dyadic* composite sociality index) as the dyadic extension of the (individual) CSI (composite sociality index). In other words, the DSI is a dyadic property while the CSI is an individual measure.
+
+I first present an example with the minimal amount of data required: a sequence of interactions along with their dates\footnote{if you prefer to work from matrices: this is also possible (see section~\ref{subsec:interactseq}) but you loose a lot of the functionality/flexibility that the package offers}. The interactions in the that table can be of different kinds, e.g. approaches, grooming and support (there is an example below). To refine the assessment of DSI scores, it is advisable (some would say mandatory) to control for observation time and co-residency. How to incorporate such data is dealt with in section~\ref{subsec:OTetal}
+
+I suggest you go through this example before you try the functions on your own data. In section~\ref{subsec:datachecks}, I describe a few preliminary checks that you could do on your own data to spot potential problems, for example whether your data sets include the appropriate column names.
+
+The following assumes you have successfully installed the \texttt{socialindices} package. First we need to attach/load it.
+
+
+```{r}
+library(socialindices2)
+```
+
+Next, we load an invented example data set and have a brief look at it.\footnote{this example data set in fact is a list that comprises the above mentioned observation time data and co-residency data as well, but for now we just use the interaction data itself}
+
+```{r}
+data(dataset3)
+SEQ <- dataset3$dataseq
+head(SEQ)
+```
+
+Each line in this table represents one interaction. The first column is the date on which the interaction took place.\footnote{Dealing with calendar dates in `R` is prone to unexpected behaviour. It seems reasonable to stick to a specific format (`YYYY-MM-DD`) and the functions assume that dates appear in this format in the objects from which the functions work.} The table also comprises a `focal` column, which represents the focal animal during the observation time of which an interaction occurred between the `actor` and the `receiver`. The corresponding behaviour is in column `beh`. As you can see in the `dur` column, some of the behaviors have durations, while some others do not.\footnote{in `R`, such absent values are conveniently coded as `NA`} We ignore this for now. Also don't worry about the `pref` column for the moment. Now, let's just get a better feel for this data set.
+
+```{r}
+table(SEQ$focal)
+table(SEQ$actor)
+table(SEQ$receiver)
+table(SEQ$beh)
+```
+
+From this we can see that we have three focal individuals, but a total of six individuals in the data set that were involved in interactions. Just imagine, we collected focal data on females, but also recorded their interactions with males. Further we see that we have a total of four behaviors in our data set. The distinction between focals and non-focals is important, as you will see now. Let's calculate the DSI then.
+
+```{r}
+DSI(SEQ)
+```
+
+These are the DSI scores for the three possible dyads of the focal individuals. This represents the default option, i.e. if not specified otherwise, only interactions within focal-focal dyads will be be considered. The first four columns contain information about the dyad: both IDs, whether the dyad comprised only focal individuals (see below) and a unique dyad name (where the dyad IDs are separated by `\_@\_`). The columns \texttt{dot} and \texttt{cores} are the values for dyadic observation time and co-residency. In this example they are identical for all dyads, because we didn't incorporate the respective data yet. Also you can see the raw counts for all the behaviors that occurred in each dyad. By default, all behaviors that were found in the `beh` column were considered, but you can change that (section~\ref{subsec:behdur}). The final columns are the DSI and a standardized version of it (\texttt{zCSI}).\footnote{for the standardized DSI, the rates of behaviors are $z$-transformed before they are added up, see @silk2013a}.
+
+For now, we used the perhaps easiest approach to calculate the DSI scores. In the following sections, I'll show how to tailor the analysis to goals of yours that may differ from what has been shown so far, as well as how to refine the analysis.
+
+## Differentiating between focals and non-focals
+
+The analysis above aimed at getting the DSI for dyads in which both individuals were focal animals. You may however wish to get a different set of dyads. The \texttt{DSI()} function allows to get two additional types of dyads, namely (1) dyads that include at least one focal and either a focal or a non-focal partner, and (2) dyads that include focal and non-focal animals but exclude focal-focal dyads\footnote{The final combination, i.e. non-focal/non-focal dyads, doesn't make sense and is not supported by the function.}. You can achieve this differentiation by setting the \texttt{onlyfocaldyads=} and \texttt{limit2focalnonfocal=} arguments.
+
+To calculate scores for focal/focal and focal/non-focal dyads, use:
+
+```{r}
+DSI(SEQ, onlyfocaldyads = FALSE)
+```
+
+Note that this will give you different DSI values for the focal/focal dyads as compared to the results above. This is normal because the DSI calculation include a step where the behaviour rates are divided by the 'group mean' (in fact, the mean of rates of all dyads). The total number of dyads in this particular case is 12 (15 total dyads [6\*5/(5-1)] - 3 non-focal/non-focal dyads [3\*2/(2-1)]). What type of dyad a line corresponds to is indicated in the \texttt{type} column: \texttt{FF} stands for focal/focal dyad and \texttt{FNF} stands for focal/non-focal dyad.
+
+If you want to exclude the focal/focal dyads, i.e. only obtain results for focal/non-focal dyads (e.g. you collected data on female focals, but are interested in female/male scores), use:
+```{r}
+DSI(SEQ, onlyfocaldyads = FALSE, limit2focalnonfocal = TRUE)
+```
+
+Again, the values will differ between these results and above for the same reasons as mentioned above. The number of dyads here is 9 (15 total dyads - 3 non-focal/non-focal dyads - 3 focal/focal dyads).
+
+## Behaviors and durations
+\label{subsec:behdur}
+
+By default, all behaviors that occur in the dataset (four in this example) are taken for the calculation of DSI scores. You may wish to use only a subset of behaviors in your dataset, for example only including grooming and support. You can do this by using the \texttt{behaviours=} argument:\footnote{for the sake of space, I revert to the default dyads, i.e. focal/focal dyads}
+
+```{r}
+DSI(SEQ, behaviours=c("gro", "supp"))
+```
+
+Likewise, you can bin different types of behaviors into broader categories, for example combining approaches and proximity versus grooming. In such a case, you need to supply a list to the \texttt{behaviour=} argument, for example:
+
+```{r}
+DSI(SEQ, behaviours=list(near=c("appr", "prox"), groom="gro") )
+```
+
+Note the 'new' categories (\texttt{near} and \texttt{groom}) in the results.
+
+Some of the behaviors you wish to consider may have durations (grooming) while other can only be counted (approach). The handling of durations is controlled by the \texttt{duration.NA.treatm=} argument. First off, if the function doesn't find a duration column in your data set (\texttt{dur} in the example), durations cannot be considered anyway and all interactions will be treated as counts/bouts. If a duration column exists, the function checks whether durations are available for all cases of a given behaviour. In the example, only grooming and proximity have duration values. The \texttt{duration.NA.treatment=} argument determines how missing values (`NA`) are treated in the duration column. For example, if all but a few a grooming interactions don't have a duration you have two choices: (1) either you omit those interactions (\texttt{duration.NA.treatment="omit"}) or (2) you can transform the entire duration column into counts, which effectively means you treat the respective behaviour as bouts (\texttt{duration.NA.treatment="count"}. In case all interactions for a given behaviour have a duration (i.e. no missing values), the option is ignored and durations will be used. If you don't want to use the durations you have to omit the duration column from the data set.
+
+Let's first introduce a few \texttt{NAs} into the data set, so the \texttt{duration.NA.treatment=} actually can have an effect.
+
+```{r}
+SEQ2 <- SEQ
+SEQ2$dur[sample(!is.na(SEQ2$dur), 10)] <- NA
+DSI(SEQ2, duration.NA.treatm = "omit")
+DSI(SEQ2, duration.NA.treatm = "count")
+```
+
+As you can see, the frequencies and rates of \textit{appr} and \textit{supp} are unchanged, because they were not affected (as they didn't have durations in the first place). But the remaining values will differ from above.\footnote{also because there is some randomness here introduced by the function \texttt{sample()} which introduced some \texttt{NA}s into the data set.} Which approach of the two is better? I don't know, but if in doubt I probably would go for the \texttt{count} option. Also, compare that to a case where a duration column might be missing altogether:
+
+```{r}
+DSI(SEQ2[, -6])
+```
+
+Here, you'll get a message displayed that no duration column was found and that durations were treated as \texttt{NA}, i.e. as counts.
+
+If you want to get an idea what difference treating durations as durations or counts, just calculate both and plot them. In this example the DSI corresponds to the grooming rate because we only consider one behaviour (i.e. grooming).
+
+```{r, fig.cap="\\label{fig:countsversusdurations} Grooming 'DSI' with durations versus counts (bouts).", fig.width=4.4, fig.height=3.3}
+data("dataset4")
+# use durations
+g1 <- DSI(dataset4$dataseq, ot.source = dataset4$ot, behaviours = "gro")
+# remove durations, effectively using counts
+g2 <- DSI(dataset4$dataseq[, -6], ot.source = dataset4$ot, behaviours = "gro")
+plot(g1$DSI, g2$DSI, xlab="grooming rate ('DSI') with durations",
+     ylab="grooming rate ('DSI') without durations", las=1, cex.lab=0.6)
+```
+
+
+## Co-residency and (dyadic) observation time
+\label{subsec:OTetal}
+
+An important assumption of the DSI is that all individuals had the same opportunity to interact. In cohesive groups this usually assured by distributing focal animal sampling as evenly as possible across all individuals. That condition is rarely met though, so at least for cohesive groups we can assume that dyadic observation time is the sum of the individual observation times. To take this into account, we can supply a table with observation times of individuals to the \texttt{DSI()} function. The table that corresponds to our example can be found in:
+
+```{r}
+OT <- dataset3$ot
+head(OT)
+```
+
+This table simply represent one line per focal animal protocol along with date it was recorded and the observation duration. Which unit you use for observation time does not matter as long as it is consistent in the table. I personally use minutes here while for durations of behaviors I use seconds. To incorporate this data in the DSI calculations:
+
+```{r}
+DSI(SEQ, ot.source = OT)
+```
+
+You can see that the dyadic observation time is not identical anymore across dyads. This affects the DSI scores, because they are based on rates (behaviour bouts or duration per time).
+
+In addition to observation time, yet another important aspect to consider is co-residency. That means that pairs of individuals may have had less opportunity to interact just because they were not in the same group during the same time, or at least had less overlap in residency as compared to other dyads. To take such co-residency issues into account, we need a presence 'table'. Again, there is already one for the example data set.
+
+```{r}
+PRES <- dataset3$presence
+head(PRES)
+```
+
+Such a presence matrix is just a table with each date represented by a line, and all individuals having their own columns. A '1' indicates that the individual was present in the group that day, whereas a '0' indicates its absence. Let's put this into the calculation:
+
+```{r}
+DSI(SEQ, ot.source = OT, presence = PRES)
+```
+
+You can see that using the presence data changes the dyadic observation time, i.e. it decreases it which in turn increases the rates of behaviors (per dyadic observation time).
+
+## Symmetric and asymmetric DSI
+\index{directionality}
+
+Social bonds are most likely (or at least frequently) not symmetric or mutual. For example, individual A can be friends with B, but B may not be friends with A. In other words, B could be A's strongest partner, but B may have individuals other than A as strongest partners. The DSI scores you have calculated so far don't account for such potential asymmetry. Using the \texttt{directed=} argument we can gauge potential asymmetry in relationships. Note that I think that this approach is meaningful only for focal/focal dyads. In terms of the results displayed, each dyad will then be represented by two lines, once from the perspective of each dyad member.
+
+```{r}
+DSI(SEQ, directed = T, ot.source = OT, presence=PRES)
+```
+
+
+## Temporal changes
+\label{subsec:temporal}
+
+If you are interested in comparing scores in different time blocks, you can easily do that by restricting the calculation to specific date ranges:
+
+```{r}
+DSI(SEQ, from = "2000-01-01", to = "2000-03-30", ot.source = OT, presence = PRES)
+DSI(SEQ, from = "2000-04-01", to = "2000-06-30", ot.source = OT, presence = PRES)
+```
+
+## Who is friends with whom?
+
+Often, we want to know something about the preferred partners of an individual, or about the strongest bonds within a group. Personally, I am a bit skeptic of this approach. However, you can assess the $n$ strongest partners with the function \texttt{friends()}. First you need to create an object in which the results of the \texttt{DSI()} function are stored. Then, all you have to specify is the number of top partners per individual you want.
+
+```{r}
+mydsi <- DSI(SEQ)
+friends(mydsi, criterion = 2)
+```
+
+The output is a list, which is nothing else then several tables 'glued' together. The first two tables each have one line per individual and in the following columns contain the IDs of the top-partners (in descending order of bond strength) and the DSI-scores with the respective individual. The final table simply summarizes the number of top-partners found (which are all two here, because that's what we wanted in the first place).
+
+If you are interested in the strongest bonds on a group level, you just have to specify one of the group-level criteria. Often, 1 standard deviation above the group mean is used (or 2, or the top 10\%, etc.), i.e. all values that are larger than the mean of all \textit{DSI}-scores\footnote{which by definition is 1} \textit{plus} the standard deviation are categorized as 'strong bonds'.
+
+```{r}
+friends(mydsi, criterion = "1sd")
+```
+
+The layout of the results is the same as before, with the difference, that now individuals can have different numbers of bond partners. Group size is particularly small in this example, so basically you can see only one dyad whose DSI value satisfies the criterion. Note that each is represented twice, once from each individual's perspective.
+
+And finally, you may wish to have just a table with the strongest bonds (from a group-level perspective). Here each dyad is only represented once...
+
+```{r}
+friends(mydsi, criterion = "1sd", tableout = TRUE)
+```
+
+## friendly issues
+
+In some situations there may be ambiguity in orders of friends, i.e. for a given individual, more than one partner individual have the same DSI score. I will illustrate this with an example, for which I round the DSI scores to introduce such ambiguity.
+
+```{r}
+data(dataset1, package = "socialindices2")
+mydsi <- DSI(dataset1$dataseq, presence=dataset1$presence, ot.source=dataset1$ot)
+mydsi$DSI <- round(mydsi$DSI, 2) # rounding
+myfriends <- friends(mydsi)
+
+myfriends[[1]][10, ]
+myfriends[[2]][10, ]
+```
+
+So, here we have an individual 'wx',\footnote{there is another one with the same issue, 'hu'} which has two partners with the same strength 0.56 ('iw' and 'nu'), which represent wx's 5th and 6th strongest partners. If we had wanted the 5 top friends to be returned by the \texttt{friends()} function, only one of the two individuals would have been printed (try with `friends(mydsi, criterion = 5)`).
+
+For now this issue is handled with a message that let's you know that such cases occur in your data. I don't know how prevalent such cases are in real data sets, but I suspect they are rather rare. For example, in the example I used, without the rounding there is no issue. I don't have a general solution for this issue, other than recommending to think hard on what to do if this happens to you. More frequent perhaps is the possibility that several partners have a DSI score of 0, i.e. several partners did not interact. In such cases, I would recommend to simply ignore partners with a score of 0. For consistency, such cases will still be reported to result in non-unique orders (via a message after the `friends()` function.
+
+## A significance test as alternative to arbitrary categories
+
+coming soon...
+
+## Data entry and checks
+\label{subsec:datachecks}
+
+Before you run the `DSI()` function on your own data, I advise to run some checks on your data first. This is meant to detect a few error types that in my experience happen quite often. This concerns mainly mismatches between the interaction and observation time data and the presence data. For examples, individuals may have been observed (according to either interaction data or observation time data) but were absent according to the presence data. If existing, such mismatches will produce errors in the \texttt{DSI()} function. Likewise, sometimes actor and receiver in interactions are identical, which is not plausible.
+
+Finally, there is the necessity to be consistent in how you label the columns in your data sets. The checking functions (\texttt{checkbehaviour()} and \texttt{checkpresence()}) therefore also inspect whether the column names in your data can be recognized. For instance, the date column can be named 'Date', 'date' or 'DATE', and the function will recognize which of the three it is in your data set, but will result in an error message if it does not find any of the built-in possibilities. Table \ref{tab:columnnames} contains the possible column names the functions in this package recognize. Because of the functions looking for column names, it is probably advisable to \textit{not} use any of the possible column names as codes for either IDs or behaviors in your data sets to avoid any confusion. I'm not sure whether an animal coded as 'OT' for example might lead to trouble. It might work or it might not. Best to avoid such IDs or behaviors.
+
+Here is a summary of the potential issues the checking functions will detect:
+
+\begin{itemize}
+  \item \texttt{checkbehaviour()} checks the following:
+  \begin{itemize}
+    \item recognizable column names in the interaction data for date, behavior, focal, actor and receiver
+    \item mismatch between actor and receiver, i.e. whether actor and receiver are identical
+  \end{itemize}
+
+  \item \texttt{checkpresence()} checks the following:
+  \begin{itemize}
+    \item recognizable column names in the presence data (and in interaction data and observation time data if supplied)
+    \item whether individuals were present on their days of interactions (and focal protocols in case observation time is supplied)
+  \end{itemize}
+\end{itemize}
+
+
+
+\begin{table}
+\centering
+\caption{Column names recognized by the \texttt{socialindices} package.}
+\begin{tabular}{l l}
+\hline
+Category & possible column names\\[10pt] \hline
+\textbf{Date} & Date, date, DATE, dte, Dte\\
+\textbf{Behaviour} & Behaviour, behaviour, Behavior, behavior, behav, Beh, beh,\\
+ & BEH, Action, action\\
+\textbf{Focal} & Focal, focal, FOCAL, Foc, foc, ID, FocalID, focalID\\
+\textbf{Actor} & Actor, actor, act, Act, giver, Giver, giv, id1, ID1\\
+\textbf{Receiver}  & Receiver, receiver, rec, Rec, recipient, Recipient, id2, ID2\\
+\textbf{Observation time}  &  OT, Ot, ot, obst, Obst, obstime, Obstime\\ \hline
+\end{tabular}
+\label{tab:columnnames}
+\end{table}
+
+
+Now we will go through some examples to demonstrate how that works. For this, we load some example data, but this time from txt-files, which you can get by exporting from Excel or OpenOffice etc. While it is possible to read data directly from Excel files (.xls or .xlsx) or SPSS files (.sav)\footnote{see the R packages \texttt{gdata} and \texttt{foreign}}, we suggest that you store your data in simple (tab-separated) text files. For example, from Excel this is possible via File>Save as... and then choosing ``tab-delimited text file" as file format\footnote{you may also save your file as comma delimited or something similar, but note that you then may need to modify the arguments to \texttt{read.table()} or use \texttt{read.csv()}}. The files I use here contain some errors, so as to demonstrate how to detect and deal with them. The files are stored in the package folder. If you don't know where that is, try:
+
+```{r, eval=FALSE}
+.libPaths()
+```
+
+So, the following line should work on most systems to read the data set with interactions:
+
+```{r}
+IA <- read.table(system.file("ex-IA.txt", package = 'socialindices2'), header=T)
+```
+
+
+To be able to repeat the example later on, I would suggest to \textit{copy} the three files \textit{ex-IA.txt}, \textit{ex-OT.txt}, and \textit{ex-PR.txt} to another location and read the files from there, e.g:
+
+```{r, eval=FALSE}
+IA <- read.table(file= "c:\\temp\\ex-IA.txt", sep= "\t", header= TRUE)
+```
+
+Now let's read an example for observation time and also a presence table:
+
+```{r, echo=FALSE}
+OT <- read.table(system.file("ex-OT.txt", package = 'socialindices2'), header=T)
+PR <- read.table(system.file("ex-PR.txt", package = 'socialindices2'), header=T)
+```
+
+```{r, eval=FALSE}
+OT <- read.table(file= "c:\\temp\\ex-OT.txt", sep= "\t", header= TRUE)
+PR <- read.table(file= "c:\\temp\\ex-PR.txt", sep= "\t", header= TRUE)
+```
+
+Now let's check the interaction data:
+
+```{r, eval=FALSE}
+checkbehaviour(b.source = IA)
+```
+
+This will give a warning message and a table with the lines of your data set where errors occurred. In this example one interaction was problematic. In line 4 actor and receiver are the identical individual. If you fix that error\footnote{I deleted the line before taking the next steps} in the txt-file (either by correcting or deleting the line), re-read the txt-file and repeat the check the warning disappears, and instead a message appears that states which ID columns were found. Normally, that should indicate that you have focal, actor and receiver. If your own data give other warnings or errors, make sure that your ID columns are properly named (see above).
+
+```{r, echo=FALSE}
+IA <- IA[-4, ]
+```
+
+```{r}
+checkbehaviour(b.source = IA)
+```
+
+Next, we check whether the presence data correspond to the interaction data. If you don't have such presence information for your own data, you can skip this step.
+
+```{r, eval=FALSE}
+checkpresence(presence=PR, b.source=IA)
+```
+
+If there are problems, you will see a table again, which indicates where the problems are situated. Here, individual 'j' was observed in an interaction on 2000-01-06 but absent according to the presence. The same applies to 'e' on a later data. As before, fix the error\footnote{I made 'j' and 'e' being present on the respective dates}, re-read the data and run the check again. That should lead to a more positive message being displayed. If you get different messages, first check whether the date column in the presence data set is named properly and that the date columns in both presence and interaction data are formatted properly (YYYY-MM-DD).
+
+```{r, echo=FALSE}
+PR[6:7, "j"] <- 1
+PR[7:9, "e"] <- 1
+```
+
+```{r}
+checkpresence(presence=PR, b.source=IA)
+```
+
+And finally, we check also the observation time data, and - surprise - yet another mismatch. There is focal data on 'i' on 2000-01-17 while the individual was supposedly absent.
+
+```{r, eval=FALSE}
+checkpresence(presence=PR, ot.source=OT)
+```
+
+Same thing here, correct the error, re-read, and re-run the check. The message will disappear.
+
+```{r, echo=FALSE}
+PR[17, "i"] <- 1
+```
+
+```{r}
+checkpresence(presence=PR, ot.source=OT)
+```
+
+If you manage the run the checks on your own data without warning messages being displayed, you are ready to run the DSI calculations:
+
+```{r}
+dsi <- DSI(IA, ot.source = OT, presence = PR)
+head(dsi)
+```
+
+Of course, I cannot guarantee that no reasons exist other than the ones described here that could make the \texttt{DSI()} function not working. If that happens, feel free to contact me to ask about about it. Ideally, you would send your data sheets along with it, so I can reproduce the results (or rather warnings) you got and then hopefully fix it.

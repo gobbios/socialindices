@@ -1,0 +1,31 @@
+
+In contrast to the DSI (section~\ref{sec:dsi}), the CSI (composite sociality index) is a measure that reflects \textit{individual} (not dyadic) behaviour [@sapolsky1997].
+
+While the overall approach for calculation CSI and DSI is the same, there is one crucial difference (in addition to the individual versus dyadic distinction). In the original paper [@sapolsky1997], once the rates per observation time had been calculated for all behaviours and individuals, the behavioural rates were standardized by dividing (for each behaviour) all individual values by the \textit{median} of all those behaviour-rates for a given behaviour. In contrast, for the dyadic DSI, the behavioural rates are standardized by dividing by the \textit{mean} [@silk2006; @silk2013a]. What consequences this difference has is unclear.\footnote{except that the group mean of CSI scores is not by definition 1, whereas for the DSI it is 1.}
+
+To calculate the CSI, most of the arguments for the function \texttt{CSI()} \index{CSI()@\texttt{CSI()}} (and data to supply to it) are identical to what you needed for \texttt{DSI()}. You will need a data.frame with the behavioural data and a corresponding table with observation times. The remaining arguments have default values\footnote{in fact, you can also omit the observation time source, which essentially means that you assume equal observation times for all individuals, which is likely to be unrealistic, though. So better supply this table...} (all behaviours are considered that appear in the data set, the date range is taken to be range of focal protocols).
+
+So let's load yet another example data set\footnote{don't forget to attach the library if you haven't done so already (\texttt{library(socialindices)})} and calculate the CSI for it:
+
+```{r}
+library(socialindices)
+```
+
+```{r}
+data(dataset4)
+SEQ <- dataset4$dataseq
+OT <- dataset4$ot
+csi <- CSI(b.source=SEQ, ot.source=OT)
+head(csi)
+```
+
+The output is very similar to the one of \texttt{DSI}. You see columns for focal individual ID, observation time (in the unit you supplied it in in the source), the raw frequencies of the behaviours considered (four in this case), the rates of these behaviours adjusted for the individual observation time, and CSI and standardized CSI.
+
+Like for the \texttt{DSI()} function, you can limit/select the behaviours, how to treat durations and/or the date range (see sections \ref{subsec:behdur} and \ref{subsec:temporal}), e.g.:
+
+```{r, eval=FALSE}
+CSI(b.source=SEQ, ot.source=OT, behaviours=c("gro", "supp"))
+CSI(b.source=SEQ, ot.source=OT, from="2000-01-01", to="2000-06-30")
+```
+
+
