@@ -1,3 +1,8 @@
+---
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
 ## Pairwise affinity index
 
 This index is based on association data and been developed specifically to deal with animals that don't forage in cohesive groups, but fission and fusion over time [@pepper1999; @silk2013a]. However, while originally aimed at fission-fusion systems, this index can also be used to analyse associations *within* stable groups in which proximity between individuals can nevertheless vary.
@@ -27,7 +32,8 @@ The data set contains 40 scans of dolphin associations, which comprise 18 recogn
 First, we start out by calculating the pairwise affinity index, and store it in an object named `res`:
 
 ```{r}
-set.seed(123); res <- pafi(dolphins, flips = 100, rand = 100, progbar = F)
+set.seed(123)
+res <- pafi(dolphins, flips = 100, rand = 100, progbar = FALSE)
 res[, c("PAfI", "exp")] <- round(res[, c("PAfI", "exp")], 3)
 head(res)
 ```
@@ -46,10 +52,10 @@ Now we can customize the analysis a little bit, for example by setting a date ra
 pafi(dolphins, daterange = c("2000-01-01", "2000-01-31"), flips = 100, rand = 100)
 ```
 
-If you have a larger data set, you may want to calculate an association index for several distinct time blocks.\index{time block} You can do this in two different ways with the function \texttt{multiasso()}.\index{multiasso()@\texttt{multiasso()}} First, you can supply a list of different date ranges to the function and use such a list for the function, for example:
+If you have a larger data set, you may want to calculate an association index for several distinct time blocks.\index{time block} You can do this in two different ways with the function \texttt{multiasso()}.\footnote{Update 2023-02-04: The function \texttt{multiasson} currently does not work!}\index{multiasso()@\texttt{multiasso()}} First, you can supply a list of different date ranges to the function and use such a list for the function, for example:
 
-```{r}
-mytimeperiods <- list(c("2000-01-01", "2000-01-10"), c("2000-01-31", "2000-02-09"))
+```{r, eval=FALSE}
+# mytimeperiods <- list(c("2000-01-01", "2000-01-10"), c("2000-01-31", "2000-02-09"))
 # res <- multiasso(dolphins, whichindex = "PAFI", daterange = mytimeperiods)
 ```
 
@@ -62,11 +68,12 @@ The result of this is a list again, which contains two items. First, a table wit
 
 Currently, the function also allows to automatically detect calender months, 2-month blocks and 3-month blocks, and do the calculations by time block without specifying each date range separately in the \texttt{daterange=} argument. For example:
 
-<<>>=
-res <- multiasso(dolphins, whichindex = "PAFI", daterange = "months")
-res[[1]]
-head(res[[2]])
-@
+```{r, eval=FALSE}
+# res <- multiasso(dolphins, whichindex = "PAFI", daterange = "months")
+# res[[1]]
+# head(res[[2]])
+```
+
 
 Because the dolphin example contains data for two months (in fact the data end 10 February), we obtain two time periods. For 2-month blocks, use \texttt{daterange = "bimonth"} and for 3-month blocks \texttt{daterange = "trimonth"}. Note that these latter two versions start in a given year's January and incomplete time blocks are ignored. For example, if your data set contains data from February through December, this will result in five 2-month blocks (Mar/Apr, May/Jun, Jul/Aug, Sep/Oct, Nov/Dec) or three 3-month blocks (Apr/May/Jun, Jul/Aug/Sep, Oct/Nov/Dec).
 
@@ -74,7 +81,8 @@ We can also specify the individuals for which we want the the indices calculated
 
 
 ```{r}
-set.seed(123); res <- pafi(dolphins, flips = 100, rand = 100, progbar = F,
+set.seed(123)
+res <- pafi(dolphins, flips = 100, rand = 100, progbar = FALSE,
      exclcols = c("B", "C", "D", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R"))
 res[, c("PAfI", "exp")] <- round(res[, c("PAfI", "exp")], 3)
 res
@@ -84,7 +92,8 @@ The function also works without the `Date` column in the association data set.
 
 ```{r}
 xdata <- dolphins[, -1]
-set.seed(123); pafi(xdata, flips = 100, rand = 100, progbar = F,
+set.seed(123)
+pafi(xdata, flips = 100, rand = 100, progbar = FALSE,
      exclcols = c("B", "C", "D", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R"))
 ```
 
@@ -115,7 +124,8 @@ pres$B[12:31] <- 0
 Now, we can calculate the association index for this data set, accounting for co-residency.
 
 ```{r}
-set.seed(123); withpres <- pafi(asso, presence = pres, progbar = F)
+set.seed(123)
+withpres <- pafi(asso, presence = pres, progbar = F)
 withpres[, c("PAfI", "exp")] <- round(withpres[, c("PAfI", "exp")], 3)
 withpres
 ```
@@ -128,7 +138,7 @@ nopres[, c("PAfI", "exp")] <- round(nopres[, c("PAfI", "exp")], 3)
 nopres
 ```
 
-The important thing to keep in mind here is that if two individuals never had the chance to associate and we don't account for that constraint, such a dyad's affinity index will be 0. But this doesn't make sense because it implies that these two individuals 'chose' not to associate. Noteworthy in this context is also that we are likely to find a non-zero expectation for the association index of such dyads, which again does not make sense ($0.640$ in this example).
+The important thing to keep in mind here is that if two individuals never had the chance to associate and we don't account for that constraint, such a dyad's affinity index will be 0. But this doesn't make sense because it implies that these two individuals 'chose' not to associate. Noteworthy in this context is also that we are likely to find a non-zero expectation for the association index of such dyads, which again does not make sense ($`r nopres$exp[1]`$ in this example).
 
 Finally, note the column `coresid` (in the `withpres` object) now contains different values, indicating how many days each dyad was co-resident. If presence data is not supplied (as in `nopres`), all co-residence values will be 1.
 

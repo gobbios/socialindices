@@ -12,7 +12,7 @@
 #'
 #' @examples
 #' data(dataset3)
-#' head(.mergeactrec(dataset3$dataseq))
+#' head(socialindices2:::.mergeactrec(dataset3$dataseq))
 
 .mergeactrec <- function(x) {
   # how many ID columns are there and what are their names

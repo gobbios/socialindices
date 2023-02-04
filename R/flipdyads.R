@@ -33,14 +33,14 @@
 
   if(!is.null(presence)) {
     if(is.null(pr.dates)) stop("dates vector has to be supplied for presence", call.=FALSE)
-    if(class(presence)!="matrix") stop("presence has to be of class matrix!", call.=FALSE)
+    if (!inherits(presence, "matrix")) stop("presence has to be of class matrix!", call.=FALSE)
     mode <- "withpres"
     pr.dates <- as.character(pr.dates)
   }
 
   if(length(x.dates)!=nrow(x)) stop("x.dates vector has to be of same length as 'x' has rows", call.=FALSE)
   x.dates <- as.character(x.dates)
-  if(class(x)!="matrix") stop("x has to be of class matrix!", call.=FALSE)
+  if (!inherits(x, "matrix")) stop("x has to be of class matrix!", call.=FALSE)
 
 
   # exclude rows in which all ids were together (regardless of focal remove or not...)

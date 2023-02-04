@@ -1,8 +1,8 @@
 Package: socialindices2
 Type: Package
 Title: social and association indices
-Version: 0.50.0
-Date: 2017-07-08
+Version: 0.50.1
+Date: 2023-02-04
 Depends: 
 Author: Christof Neumann
 Maintainer: Christof Neumann <christofneumann1@gmail.com>
@@ -10,6 +10,6 @@ Description: Calculate social and association indices from individual data. Thin
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 6.0.1
+RoxygenNote: 7.2.3
 Suggests: knitr, rmarkdown, zoo, EloRating
 VignetteBuilder: knitr

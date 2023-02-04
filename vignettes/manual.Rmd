@@ -2,8 +2,6 @@
 title: "`socialindices` - a (not entirely) brief tutorial to quantify social bonds with `R`"
 author: "Christof Neumann"
 date: "`r Sys.Date()`"
-header-includes:
-   - \usepackage[table]{xcolor}
 output: 
   rmarkdown::pdf_document:
     toc: true

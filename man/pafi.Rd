@@ -4,9 +4,17 @@
 \alias{pafi}
 \title{Pair-wise affinity index}
 \usage{
-pafi(assodata, presence = NULL, daterange = NULL, flips = 500,
-  rand = 10, removesolitary = FALSE, addIDs = FALSE, exclcols = NULL,
-  progbar = TRUE)
+pafi(
+  assodata,
+  presence = NULL,
+  daterange = NULL,
+  flips = 500,
+  rand = 10,
+  removesolitary = FALSE,
+  addIDs = FALSE,
+  exclcols = NULL,
+  progbar = TRUE
+)
 }
 \arguments{
 \item{assodata}{data frame with association data. Can include a date column (ignored if no daterange is specified), and a focal column (if not found, column names (excluding date if found) are assumed to be "focals", i.e. individuals that are considered for calculating the index).}

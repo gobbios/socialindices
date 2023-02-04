@@ -4,9 +4,17 @@
 \alias{datagen}
 \title{generate random social interaction data}
 \usage{
-datagen(no = 50, ni = 5, beh = c("appr", "gro", "supp", "prox"),
-  behw = c(0.2, 0.3, 0.1, 0.4), behdur = c(F, T, F, T), biaswithin = 1,
-  friendprop = 0.1, nadd = 0, presence = NULL)
+datagen(
+  no = 50,
+  ni = 5,
+  beh = c("appr", "gro", "supp", "prox"),
+  behw = c(0.2, 0.3, 0.1, 0.4),
+  behdur = c(F, T, F, T),
+  biaswithin = 1,
+  friendprop = 0.1,
+  nadd = 0,
+  presence = NULL
+)
 }
 \arguments{
 \item{no}{number of interactions to be created}

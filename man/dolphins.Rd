@@ -4,7 +4,9 @@
 \name{dolphins}
 \alias{dolphins}
 \title{dolphins in Porpoise Bay in 1996-1997}
-\format{data.frame, 18 indidivuals A through R, 0 indicates individual was absent, 1 indicates individual was present}
+\format{
+data.frame, 18 indidivuals A through R, 0 indicates individual was absent, 1 indicates individual was present
+}
 \usage{
 dolphins
 }

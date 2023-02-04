@@ -4,10 +4,19 @@
 \alias{DSI}
 \title{DSI ("dyadic CSI")}
 \usage{
-DSI(b.source, from = NULL, to = NULL, behaviours = NULL,
-  ot.source = NULL, ot.type = "table", duration.NA.treatm = "omit",
-  presence = NULL, directed = FALSE, onlyfocaldyads = TRUE,
-  limit2focalnonfocal = FALSE)
+DSI(
+  b.source,
+  from = NULL,
+  to = NULL,
+  behaviours = NULL,
+  ot.source = NULL,
+  ot.type = "table",
+  duration.NA.treatm = "omit",
+  presence = NULL,
+  directed = FALSE,
+  onlyfocaldyads = TRUE,
+  limit2focalnonfocal = FALSE
+)
 }
 \arguments{
 \item{b.source}{data frame with behavioural data}

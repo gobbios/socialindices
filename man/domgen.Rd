@@ -4,8 +4,14 @@
 \alias{domgen}
 \title{generate random data for bond package}
 \usage{
-domgen(bondsdata = NULL, no = 100, ago = c("suppl", "thrt", "fight"),
-  agow = c(0.6, 0.3, 0.1), drawprop = 0.1, reversals = 0.1)
+domgen(
+  bondsdata = NULL,
+  no = 100,
+  ago = c("suppl", "thrt", "fight"),
+  agow = c(0.6, 0.3, 0.1),
+  drawprop = 0.1,
+  reversals = 0.1
+)
 }
 \arguments{
 \item{bondsdata}{output from \code{\link{datagen}}}

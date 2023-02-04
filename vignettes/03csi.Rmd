@@ -8,7 +8,7 @@ To calculate the CSI, most of the arguments for the function \texttt{CSI()} \ind
 So let's load yet another example data set\footnote{don't forget to attach the library if you haven't done so already (\texttt{library(socialindices)})} and calculate the CSI for it:
 
 ```{r}
-library(socialindices)
+library(socialindices2)
 ```
 
 ```{r}

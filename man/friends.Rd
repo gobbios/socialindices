@@ -4,8 +4,13 @@
 \alias{friends}
 \title{top partners}
 \usage{
-friends(x, criterion = NULL, indexcols = "DSI", IDcols = c("i1", "i2"),
-  tableout = FALSE)
+friends(
+  x,
+  criterion = NULL,
+  indexcols = "DSI",
+  IDcols = c("i1", "i2"),
+  tableout = FALSE
+)
 }
 \arguments{
 \item{x}{output from \code{\link{DSI}}}

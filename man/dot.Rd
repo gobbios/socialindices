@@ -4,8 +4,14 @@
 \alias{dot}
 \title{dyadic observation time}
 \usage{
-dot(ot.source, dyads, daterange = NULL, presence = NULL,
-  ot.style = "table", exclcols = NULL)
+dot(
+  ot.source,
+  dyads,
+  daterange = NULL,
+  presence = NULL,
+  ot.style = "table",
+  exclcols = NULL
+)
 }
 \arguments{
 \item{ot.source}{observation time data, for the moment only supported in table form, not yet in party-style. Must contain a "focal" column, a date column, and a observation time column}

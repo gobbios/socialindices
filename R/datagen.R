@@ -56,7 +56,7 @@ datagen <- function(no=50, ni=5, beh=c("appr", "gro", "supp", "prox"), behw=c(0.
   ppmat <- pmat[dts, ]
   # possible follows...
   posfol <- apply(ppmat[, focals], 1, function(z) colnames(ppmat[,focals])[z==1])
-  if(class(posfol)=="matrix") posfol <- lapply(apply(posfol, 2, list), unlist)
+  if (inherits(posfol, "matrix")) posfol <- lapply(apply(posfol, 2, list), unlist)
   # limit to three follows per day
   posfoln <- unlist(lapply(posfol, length)); posfoln[posfoln>3] <- 3
 

@@ -9,7 +9,8 @@
 \alias{dataset4}
 \alias{domseq4}
 \title{example data sets for socialindices}
-\format{\itemize{
+\format{
+\itemize{
 \item \code{dataseq} data.frame with interaction data
 \item \code{ot} data.frame with observation time of individual protocols
 \item \code{presence} presence table of focal individuals
@@ -17,7 +18,8 @@
 \item \code{prefdyads} dyads with higher rate/longer duration of interactions
 \item \code{focals} character, focal individuals
 \item \code{nonfocs} character, nonfocal individuals
-}}
+}
+}
 \usage{
 dataset1
 }

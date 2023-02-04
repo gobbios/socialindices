@@ -4,8 +4,15 @@
 \alias{CSI}
 \title{CSI (individual CSI)}
 \usage{
-CSI(b.source, from = NULL, to = NULL, behaviours = NULL,
-  ot.source = NULL, ot.type = "table", duration.NA.treatm = "omit")
+CSI(
+  b.source,
+  from = NULL,
+  to = NULL,
+  behaviours = NULL,
+  ot.source = NULL,
+  ot.type = "table",
+  duration.NA.treatm = "omit"
+)
 }
 \arguments{
 \item{b.source}{data frame with behavioural data}

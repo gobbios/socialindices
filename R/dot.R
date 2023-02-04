@@ -27,8 +27,8 @@ dot <- function(ot.source, dyads, daterange=NULL, presence=NULL, ot.style="table
   if(ot.style=="party") {
     # exclude columns
     if(!is.null(exclcols)) {
-      if(class(exclcols)=="character") ot.source <- ot.source[, -c(which(colnames(ot.source) %in% exclcols))]
-      if(class(exclcols)=="numeric") ot.source <- ot.source[, -c(exclcols)]
+      if (inherits(exclcols, "character")) ot.source <- ot.source[, -c(which(colnames(ot.source) %in% exclcols))]
+      if (inherits(exclcols, "numeric")) ot.source <- ot.source[, -c(exclcols)]
     }
 
     if(!is.matrix(dyads)) {

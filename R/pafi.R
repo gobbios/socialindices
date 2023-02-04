@@ -274,7 +274,7 @@ pafi <- function(assodata, presence=NULL, daterange=NULL, flips=500, rand=10, re
       #rr <- sapply(1:rand, function(X) foopres(flipdyads(assodata, dte.asso, flips, presence, dte.pres)))
       #rr2 <- vapply(1:rand, function(X) foopres(flipdyads(assodata, dte.asso, flips, presence, dte.pres)), numeric(length(ID1)))
       for(r in 1:rand) {
-        temp <- .flipdyads(assodata, dte.asso, flips, presence, dte.pres)
+        temp <- .flipdyads(x = assodata, x.dates = dte.asso, flips = flips, presence = presence, pr.dates = dte.pres)
         randores[, r] <- foopres(temp); rm(temp)
         if(progbar) setTxtProgressBar(pb, r)
       }
